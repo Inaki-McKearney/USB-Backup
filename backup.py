@@ -20,7 +20,6 @@ def get_drives(devices):
             drive_list.remove(l)
 
     return drive_list
-    # print(datetime.utcfromtimestamp(list(devices.values())[0]).strftime('%Y-%m-%d %H:%M:%S'))
 
 
 def get_paths(directory):
@@ -33,27 +32,34 @@ def get_paths(directory):
     return paths
 
 
-def zip_it(src, dest):
-    with ZipFile(dest, 'w') as zip:
-        # writing each file one by one
+def zip_it(src, des):
+    with ZipFile(des, 'w') as zippy:
         for file in get_paths(src):
             try:
-                zip.write(file)
+                zippy.write(file)
             except ValueError as e:
-                print(str(e) + ' ' + file)
+                print(str(e), file, sep=': ')
 
 
-def copy(src, dest):
-    # Copies files while deleting empty folders
+def copy_it(src, des):
+    # Copies files ignoring empty folders and up-to-date files
     paths = get_paths(src)
 
     for path in paths:
-        folder = dest + os.path.split(os.path.splitdrive(path)[1])[0]
+        print(path)
+        folder = des + os.path.split(os.path.splitdrive(path)[1])[0]
         if not os.path.exists(folder):
             os.makedirs(folder)
-        # print(path, folder, sep='   -   ')
+
+        # Checks if the file exists and if it is the latest version
+        if os.path.exists((os.path.join(folder, os.path.split(path)[1]))):
+            file_synced = os.stat(path).st_mtime <= os.stat(os.path.join(folder, os.path.split(path)[1])).st_mtime
+        else:
+            file_synced = False
+
         try:
-            shutil.copy2(path, folder)
+            if not file_synced:
+                shutil.copy2(path, folder)
         except PermissionError:
             # Removes Read-Only permission, overwrites file (with original's permissions)
             os.chmod(os.path.join(folder, os.path.split(path)[1]), stat.S_IWRITE)
@@ -66,11 +72,13 @@ def main():
     backup_directory = 'D:/Documents/USB Backup/'
 
     for drive in get_drives(devices):
-        start_time = time.time()
+        # start_time = time.time()
         # zip_it(drive, backup_directory + str(datetime.now().date()) + '.zip')
-        # copy_it('J:/', backup_directory + str(datetime.now().date()))
-        copy(drive, backup_directory + str(datetime.now().date()))
-        print(f'drive {drive} zipped in {time.time()-start_time} seconds')
+        # print(f'drive {drive} zipped in {time.time()-start_time} seconds')
+
+        start_time = time.time()
+        copy_it(drive, backup_directory + str(datetime.now().date()))
+        print(f'drive {drive} copied in {time.time()-start_time} seconds')
 
 
 if __name__ == "__main__":
