@@ -46,14 +46,15 @@ def copy_it(src, des):
     paths = get_paths(src)
 
     for path in paths:
-        print(path)
         folder = des + os.path.split(os.path.splitdrive(path)[1])[0]
+        target = os.path.join(folder, os.path.split(path)[1])
+
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        # Checks if the file exists and if it is the latest version
-        if os.path.exists((os.path.join(folder, os.path.split(path)[1]))):
-            file_synced = os.stat(path).st_mtime <= os.stat(os.path.join(folder, os.path.split(path)[1])).st_mtime
+        # Checks if the file exists and if was modified
+        if os.path.exists(target):
+            file_synced = os.stat(path).st_mtime <= os.stat(des).st_mtime
         else:
             file_synced = False
 
@@ -62,7 +63,7 @@ def copy_it(src, des):
                 shutil.copy2(path, folder)
         except PermissionError:
             # Removes Read-Only permission, overwrites file (with original's permissions)
-            os.chmod(os.path.join(folder, os.path.split(path)[1]), stat.S_IWRITE)
+            os.chmod(target, stat.S_IWRITE)
             shutil.copy2(path, folder)
 
 
