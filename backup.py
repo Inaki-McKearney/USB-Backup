@@ -8,18 +8,9 @@ import stat
 
 
 def get_drives(devices):
-    # Stores list of drive letters of connected storage devices
+    # List of drive letters of connected storage devices selected to be backed up
     drive_list = [l + ':/' for l in string.ascii_uppercase if os.path.exists(f'{l}:/')]
-
-    # Clears the drive_list of unwanted volumes and updates devices dictionary with last modification date
-    for l in drive_list[:]:
-        dev = os.stat(l)
-        if dev.st_dev in devices.keys():
-            devices[dev.st_dev] = dev.st_mtime
-        else:
-            drive_list.remove(l)
-
-    return drive_list
+    return [l for l in drive_list if os.stat(l).st_dev in devices.keys()]
 
 
 def get_paths(directory):
@@ -54,7 +45,7 @@ def copy_it(src, des):
 
         # Checks if the file exists and if was modified
         if os.path.exists(target):
-            file_synced = os.stat(path).st_mtime <= os.stat(des).st_mtime
+            file_synced = os.stat(path).st_mtime <= os.stat(target).st_mtime
         else:
             file_synced = False
 
@@ -69,7 +60,7 @@ def copy_it(src, des):
 
 def main():
     # TODO: Replace with config
-    devices = {3662415509: 0}
+    devices = {4035802026: 'WorkDrive'}
     backup_directory = 'D:/Documents/USB Backup/'
 
     for drive in get_drives(devices):
