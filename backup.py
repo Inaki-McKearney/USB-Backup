@@ -1,6 +1,5 @@
 import os
 import string
-from datetime import datetime
 import time
 from zipfile import ZipFile
 import shutil
@@ -8,9 +7,9 @@ import stat
 
 
 def get_drives(devices):
-    # List of drive letters of connected storage devices selected to be backed up
+    # Returns drive letters of connected storage devices selected to be backed up and backup names
     drive_list = [l + ':/' for l in string.ascii_uppercase if os.path.exists(f'{l}:/')]
-    return [l for l in drive_list if os.stat(l).st_dev in devices.keys()]
+    return zip([l for l in drive_list if os.stat(l).st_dev in devices.keys()], devices.values())
 
 
 def get_paths(directory):
@@ -63,13 +62,13 @@ def main():
     devices = {4035802026: 'WorkDrive'}
     backup_directory = 'D:/Documents/USB Backup/'
 
-    for drive in get_drives(devices):
+    for drive, name in get_drives(devices):
         # start_time = time.time()
         # zip_it(drive, backup_directory + str(datetime.now().date()) + '.zip')
         # print(f'drive {drive} zipped in {time.time()-start_time} seconds')
 
         start_time = time.time()
-        copy_it(drive, backup_directory + str(datetime.now().date()))
+        copy_it(drive, backup_directory + name)
         print(f'drive {drive} copied in {time.time()-start_time} seconds')
 
 
