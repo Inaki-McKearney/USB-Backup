@@ -4,6 +4,7 @@ import time
 from zipfile import ZipFile
 import shutil
 import stat
+import config
 
 
 def get_drives(devices):
@@ -42,7 +43,7 @@ def copy_it(src, des):
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        # Checks if the file exists and if was modified
+        # Checks if the file exists and if it was modified
         if os.path.exists(target):
             file_synced = os.stat(path).st_mtime <= os.stat(target).st_mtime
         else:
@@ -58,18 +59,21 @@ def copy_it(src, des):
 
 
 def main():
-    # TODO: Replace with config
-    devices = {4035802026: 'WorkDrive'}
-    backup_directory = 'D:/Documents/USB Backup/'
+    devices = config.DEVICES
+    des_dir = config.BACKUP_DIRECTORY
 
     for drive, name in get_drives(devices):
-        # start_time = time.time()
-        # zip_it(drive, backup_directory + str(datetime.now().date()) + '.zip')
-        # print(f'drive {drive} zipped in {time.time()-start_time} seconds')
 
-        start_time = time.time()
-        copy_it(drive, backup_directory + name)
-        print(f'drive {drive} copied in {time.time()-start_time} seconds')
+        # TODO: Check if contents have been updated before zipping
+        if config.ZIP:
+            start_time = time.time()
+            zip_it(drive, des_dir + name + '.zip')
+            print(f'drive {drive} zipped in {time.time()-start_time} seconds')
+
+        if config.COPY:
+            start_time = time.time()
+            copy_it(drive, des_dir + name)
+            print(f'drive {drive} copied in {time.time()-start_time} seconds')
 
 
 if __name__ == "__main__":
