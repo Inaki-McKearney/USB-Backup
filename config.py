@@ -5,7 +5,11 @@ BACKUP_DIRECTORY = 'D:/Documents/USB Backup/'
 COPY = 1
 
 # Enable to compress drive content as one zip
-ZIP = 1
+ZIP = 0
+
+# Enable to close when finished
+# Disable to view times/errors
+CLOSE = 0
 
 # Devices to be backed up
 DEVICES = {

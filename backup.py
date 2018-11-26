@@ -75,6 +75,9 @@ def main():
             copy_it(drive, des_dir + name)
             print(f'drive {drive} copied in {time.time()-start_time} seconds')
 
+    if not config.CLOSE:
+        input()
+
 
 if __name__ == "__main__":
     main()
