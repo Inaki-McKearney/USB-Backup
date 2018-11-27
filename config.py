@@ -11,6 +11,9 @@ ZIP = 0
 # Disable to view times/errors
 CLOSE = 0
 
+# Enable to print bell code upon script completion
+NOTIFY = 1
+
 # Devices to be backed up
 DEVICES = {
     # 'DeviceID': 'BackupName'
