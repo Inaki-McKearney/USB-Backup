@@ -35,6 +35,7 @@ def zip_it(src, des):
 def copy_it(src, des):
     # Copies files ignoring empty folders and up-to-date files
     paths = get_paths(src)
+    file_count = len(paths)
 
     for path in paths:
         folder = des + os.path.split(os.path.splitdrive(path)[1])[0]
@@ -57,6 +58,8 @@ def copy_it(src, des):
             os.chmod(target, stat.S_IWRITE)
             shutil.copy2(path, folder)
 
+        print(f'\r{(paths.index(path)+1)/file_count*100:.2f}% Complete\t', end='')
+
 
 def main():
     devices = config.DEVICES
@@ -68,12 +71,12 @@ def main():
         if config.ZIP:
             start_time = time.time()
             zip_it(drive, des_dir + name + '.zip')
-            print(f'drive {drive} zipped in {time.time()-start_time} seconds')
+            print(f'Drive {drive}\tZipped in {time.time()-start_time} seconds')
 
         if config.COPY:
             start_time = time.time()
             copy_it(drive, des_dir + name)
-            print(f'drive {drive} copied in {time.time()-start_time} seconds')
+            print(f'Drive {drive}\tCopied in {time.time()-start_time} seconds')
 
     if config.NOTIFY:
         print('\a')
