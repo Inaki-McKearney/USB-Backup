@@ -2,10 +2,10 @@
 BACKUP_DIRECTORY = 'D:/Documents/USB Backup/'
 
 # Enable to copy drive content as one folder
-COPY = 1
+COPY = 0
 
 # Enable to compress drive content as one zip
-ZIP = 0
+ZIP = 1
 
 # Enable to close when finished
 # Disable to view times/errors

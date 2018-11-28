@@ -25,11 +25,14 @@ def get_paths(directory):
 
 def zip_it(src, des):
     with ZipFile(des, 'w') as zippy:
-        for file in get_paths(src):
+        paths = get_paths(src)
+        file_count = len(paths)
+        for file in paths:
             try:
                 zippy.write(file)
             except ValueError as e:
                 print(str(e), file, sep=': ')
+            print(f'\r{(paths.index(file)+1)/file_count*100:.2f}% Complete\t', end='')
 
 
 def copy_it(src, des):
