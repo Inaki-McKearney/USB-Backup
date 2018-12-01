@@ -53,7 +53,7 @@ def zip_it(src, des):
                 if date_modified > last_modified:
                     last_modified = date_modified
             except ValueError as e:
-                print(str(e), file, sep=': ')
+                print(f'\r{str(e)}: {file}')
             print(f'\r{(paths.index(file)+1)/file_count*100:.2f}% Complete\t', end='')
         # Stores the latest modified time in the zip comment
         zippy.comment = str(last_modified).encode()
@@ -93,8 +93,6 @@ def main():
     des_dir = config.BACKUP_DIRECTORY
 
     for drive, name in get_drives(devices):
-
-        # TODO: Check if contents have been updated before zipping
         if config.ZIP:
             start_time = time.time()
             zip_it(drive, des_dir + name + '.zip')
