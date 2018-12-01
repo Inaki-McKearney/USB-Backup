@@ -9,7 +9,7 @@ ZIP = 1
 
 # Enable to close when finished
 # Disable to view times/errors
-CLOSE = 0
+CLOSE = 1
 
 # Enable to print bell code upon script completion
 NOTIFY = 1

@@ -1,7 +1,7 @@
 import os
 import string
 import time
-from zipfile import ZipFile
+from zipfile import ZipFile, BadZipFile
 import shutil
 import stat
 import config
@@ -23,16 +23,40 @@ def get_paths(directory):
     return paths
 
 
+def zip_modified(src, des):
+    # Returns True if the backup is not up to date with the source or if previous compression was aborted
+    src_mod_date = max(map(lambda x: os.stat(x).st_mtime, src))
+    if os.path.exists(des):
+        try:
+            with ZipFile(des, 'r') as zippy:
+                return src_mod_date > float(zippy.comment.decode())
+        except BadZipFile:
+            print("\nError retrieving date modified - Previous compression terminated prematurely")
+    return True
+
+
 def zip_it(src, des):
+    # Zips files after checking if the contents are up to date
+    last_modified = 0
+    paths = get_paths(src)
+
+    if not zip_modified(paths, des):
+        print("Zip in backup folder is up to date")
+        return
+
     with ZipFile(des, 'w') as zippy:
-        paths = get_paths(src)
         file_count = len(paths)
         for file in paths:
+            date_modified = os.stat(file).st_mtime
             try:
                 zippy.write(file)
+                if date_modified > last_modified:
+                    last_modified = date_modified
             except ValueError as e:
                 print(str(e), file, sep=': ')
             print(f'\r{(paths.index(file)+1)/file_count*100:.2f}% Complete\t', end='')
+        # Stores the latest modified time in the zip comment
+        zippy.comment = str(last_modified).encode()
 
 
 def copy_it(src, des):
@@ -74,12 +98,12 @@ def main():
         if config.ZIP:
             start_time = time.time()
             zip_it(drive, des_dir + name + '.zip')
-            print(f'Drive {drive}\tZipped in {time.time()-start_time} seconds')
+            print(f'Drive {drive}\tZipped in {time.time()-start_time} seconds', end='\n\n')
 
         if config.COPY:
             start_time = time.time()
             copy_it(drive, des_dir + name)
-            print(f'Drive {drive}\tCopied in {time.time()-start_time} seconds')
+            print(f'Drive {drive}\tCopied in {time.time()-start_time} seconds', end='\n\n')
 
     if config.NOTIFY:
         print('\a')
