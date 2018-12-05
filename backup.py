@@ -29,7 +29,10 @@ def zip_modified(src, des):
     if os.path.exists(des):
         try:
             with ZipFile(des, 'r') as zippy:
-                return src_mod_date > float(zippy.comment.decode())
+                comment = zippy.comment.decode()
+                if not comment:
+                    return True
+                return src_mod_date > float(comment)
         except BadZipFile:
             print("\nError retrieving date modified - Previous compression terminated prematurely")
     return True
