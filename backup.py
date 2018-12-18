@@ -4,7 +4,7 @@ import time
 from zipfile import ZipFile, BadZipFile
 import shutil
 import stat
-import config
+import yaml
 
 
 def get_drives(devices):
@@ -92,24 +92,28 @@ def copy_it(src, des):
 
 
 def main():
-    devices = config.DEVICES
-    des_dir = config.BACKUP_DIRECTORY
+    # Loads config file
+    with open("config.yaml", 'r') as yml:
+        cfg = yaml.load(yml)
+
+    devices = cfg['DEVICES']
+    des_dir = cfg['BACKUP_DIRECTORY']
 
     for drive, name in get_drives(devices):
-        if config.ZIP:
+        if cfg['ZIP']:
             start_time = time.time()
             zip_it(drive, des_dir + name + '.zip')
             print(f'Drive {drive}\tZipped in {time.time()-start_time} seconds', end='\n\n')
 
-        if config.COPY:
+        if cfg['COPY']:
             start_time = time.time()
             copy_it(drive, des_dir + name)
             print(f'Drive {drive}\tCopied in {time.time()-start_time} seconds', end='\n\n')
 
-    if config.NOTIFY:
+    if cfg['NOTIFY']:
         print('\a')
 
-    if not config.CLOSE:
+    if not cfg['CLOSE']:
         input()
 
 
